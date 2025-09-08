@@ -8,10 +8,9 @@
   <style>
     body {
       font-family: sans-serif;
-      max-width: 576px;
-
-      padding: 0 16px;
+      max-width: 768px;
       margin: 32px auto;
+      padding: 0 16px;
     }
 
     h2 {
@@ -22,48 +21,59 @@
     form {
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 8px;
       margin-bottom: 32px;
+      padding: 16px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
     }
 
     input,
     button {
       padding: 16px;
+      font-size: 16px;
     }
 
-    #status-message {
-      margin-top: 16px;
+    button {
+      cursor: pointer;
+    }
+
+    #products-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .product-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
       padding: 16px;
+      border: 1px solid #eee;
       border-radius: 4px;
-      background-color: #f0f0f0;
+    }
+
+    .product-item div {
+      display: flex;
+      gap: 8px;
     }
   </style>
 </head>
 
 <body>
-  <h1>Тестовий клієнт для Passport.js</h1>
+  <h1>Керування товарами</h1>
 
-  <div id="status-message">Очікування дій...</div>
-
-  <h2>Реєстрація</h2>
-  <form id="register-form">
-    <input type="email" id="register-email" placeholder="Email" required>
-    <input type="password" id="register-password" placeholder="Пароль" required>
-    <button type="submit">Зареєструватися</button>
+  <form id="product-form">
+    <h2>Додати новий товар</h2>
+    <input type="text" id="name" placeholder="Назва товару" required>
+    <input type="number" id="price" placeholder="Ціна" required>
+    <input type="text" id="category" placeholder="Категорія" required>
+    <button type="submit">Додати товар</button>
   </form>
 
-  <h2>Вхід</h2>
-  <form id="login-form">
-    <input type="email" id="login-email" placeholder="Email" required>
-    <input type="password" id="login-password" placeholder="Пароль" required>
-    <button type="submit">Увійти</button>
-  </form>
-
-  <h2>Захищені дії</h2>
-  <button id="protected-btn">Отримати секретні дані</button>
-  <button id="logout-btn">Вийти</button>
-  <button id="get-users-btn">Отримати список користувачів</button>
-  <div id="users-list-container" style="margin-top: 16px;"></div>
+  <h2>Список товарів</h2>
+  <div id="products-list">
+  </div>
 
   <script src="app.js"></script>
 </body>

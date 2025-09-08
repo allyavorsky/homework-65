@@ -6,6 +6,7 @@ const app = express();
 const port = 3000;
 
 app.use(express.json());
+app.use(express.static("public"));
 
 const mongoUrl = process.env.MONGO_URI;
 const client = new MongoClient(mongoUrl);
@@ -22,11 +23,22 @@ async function connectDB() {
   }
 }
 
-// READ: (all)
+// READ: (all))
 app.get("/products", async (req, res) => {
   try {
     const collection = db.collection("products");
-    const products = await collection.find({}).toArray();
+
+    const fields = req.query.fields;
+    let projection = {};
+
+    if (fields) {
+      projection = fields.split(",").reduce((acc, field) => {
+        acc[field.trim()] = 1;
+        return acc;
+      }, {});
+    }
+
+    const products = await collection.find({}).project(projection).toArray();
     res.json(products);
   } catch (error) {
     console.error("Error fetching products:", error);
@@ -91,12 +103,10 @@ app.patch("/products/:id", async (req, res) => {
       if (result.matchedCount === 0) {
         return res.status(404).json({ message: "Product not found" });
       }
-      res
-        .status(200)
-        .json({
-          message: "Product updated successfully",
-          modifiedCount: result.modifiedCount,
-        });
+      res.status(200).json({
+        message: "Product updated successfully",
+        modifiedCount: result.modifiedCount,
+      });
     } catch (error) {
       return res.status(400).json({ message: "Invalid product ID format" });
     }
@@ -155,12 +165,10 @@ app.put("/products/:id", async (req, res) => {
       if (result.matchedCount === 0) {
         return res.status(404).json({ message: "Product not found" });
       }
-      res
-        .status(200)
-        .json({
-          message: "Product replaced successfully",
-          modifiedCount: result.modifiedCount,
-        });
+      res.status(200).json({
+        message: "Product replaced successfully",
+        modifiedCount: result.modifiedCount,
+      });
     } catch (error) {
       return res.status(400).json({ message: "Invalid product ID format" });
     }
