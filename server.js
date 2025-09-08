@@ -80,6 +80,41 @@ app.post("/products/many", async (req, res) => {
   }
 });
 
+// UPDATE: single
+app.patch("/products/:id", async (req, res) => {
+  try {
+    const collection = db.collection("products");
+    const { id } = req.params;
+    const updates = req.body;
+
+    if (!updates || Object.keys(updates).length === 0) {
+      return res.status(400).json({ message: "Update data is required" });
+    }
+
+    const filter = { _id: new ObjectId(id) };
+    const updateDoc = {
+      $set: updates,
+    };
+
+    const result = await collection.updateOne(filter, updateDoc);
+
+    if (result.matchedCount === 0) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    res.status(200).json({
+      message: "Product updated successfully",
+      modifiedCount: result.modifiedCount,
+    });
+  } catch (error) {
+    if (error instanceof BSON.ObjectId.InvalidId) {
+      return res.status(400).json({ message: "Invalid product ID format" });
+    }
+    console.error("Error updating product:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
 const startServer = async () => {
   await connectDB();
   app.listen(port, () => {
