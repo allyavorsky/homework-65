@@ -22,7 +22,6 @@ async function connectDB() {
   }
 }
 
-// READ
 app.get("/products", async (req, res) => {
   try {
     const collection = db.collection("products");
@@ -34,7 +33,6 @@ app.get("/products", async (req, res) => {
   }
 });
 
-// CREATE (product)
 app.post("/products", async (req, res) => {
   try {
     const collection = db.collection("products");
@@ -53,7 +51,6 @@ app.post("/products", async (req, res) => {
   }
 });
 
-// CREATE (products)
 app.post("/products/many", async (req, res) => {
   try {
     const collection = db.collection("products");
@@ -75,7 +72,6 @@ app.post("/products/many", async (req, res) => {
   }
 });
 
-// UPDATE (product)
 app.patch("/products/:id", async (req, res) => {
   try {
     const collection = db.collection("products");
@@ -95,10 +91,12 @@ app.patch("/products/:id", async (req, res) => {
         return res.status(404).json({ message: "Product not found" });
       }
 
-      res.status(200).json({
-        message: "Product updated successfully",
-        modifiedCount: result.modifiedCount,
-      });
+      res
+        .status(200)
+        .json({
+          message: "Product updated successfully",
+          modifiedCount: result.modifiedCount,
+        });
     } catch (error) {
       return res.status(400).json({ message: "Invalid product ID format" });
     }
@@ -108,7 +106,6 @@ app.patch("/products/:id", async (req, res) => {
   }
 });
 
-// UPDATE: (products)
 app.patch("/products/many", async (req, res) => {
   try {
     const collection = db.collection("products");
@@ -136,6 +133,68 @@ app.patch("/products/many", async (req, res) => {
     });
   } catch (error) {
     console.error("Error updating multiple products:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+app.put("/products/:id", async (req, res) => {
+  try {
+    const collection = db.collection("products");
+    const { id } = req.params;
+    const replacementProduct = req.body;
+
+    if (
+      !replacementProduct ||
+      !replacementProduct.name ||
+      !replacementProduct.price
+    ) {
+      return res
+        .status(400)
+        .json({ message: "Replacement data must include name and price" });
+    }
+
+    try {
+      const filter = { _id: new ObjectId(id) };
+      const result = await collection.replaceOne(filter, replacementProduct);
+
+      if (result.matchedCount === 0) {
+        return res.status(404).json({ message: "Product not found" });
+      }
+
+      res
+        .status(200)
+        .json({
+          message: "Product replaced successfully",
+          modifiedCount: result.modifiedCount,
+        });
+    } catch (error) {
+      return res.status(400).json({ message: "Invalid product ID format" });
+    }
+  } catch (error) {
+    console.error("Error replacing product:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+app.delete("/products/:id", async (req, res) => {
+  try {
+    const collection = db.collection("products");
+    const { id } = req.params;
+
+    try {
+      const filter = { _id: new ObjectId(id) };
+      const result = await collection.deleteOne(filter);
+
+      if (result.deletedCount === 0) {
+        return res.status(404).json({ message: "Product not found" });
+      }
+
+      res.status(200).json({ message: "Product deleted successfully" });
+    } catch (error) {
+      return res.status(400).json({ message: "Invalid product ID format" });
+    }
+  } catch (error) {
+    console.error("Error deleting product:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
