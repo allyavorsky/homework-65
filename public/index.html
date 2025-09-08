@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="uk">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Homework 65 | Розширення функціональності сервера Express з MongoDB Atlas</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      max-width: 576px;
+
+      padding: 0 16px;
+      margin: 32px auto;
+    }
+
+    h2 {
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 8px;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    input,
+    button {
+      padding: 16px;
+    }
+
+    #status-message {
+      margin-top: 16px;
+      padding: 16px;
+      border-radius: 4px;
+      background-color: #f0f0f0;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Тестовий клієнт для Passport.js</h1>
+
+  <div id="status-message">Очікування дій...</div>
+
+  <h2>Реєстрація</h2>
+  <form id="register-form">
+    <input type="email" id="register-email" placeholder="Email" required>
+    <input type="password" id="register-password" placeholder="Пароль" required>
+    <button type="submit">Зареєструватися</button>
+  </form>
+
+  <h2>Вхід</h2>
+  <form id="login-form">
+    <input type="email" id="login-email" placeholder="Email" required>
+    <input type="password" id="login-password" placeholder="Пароль" required>
+    <button type="submit">Увійти</button>
+  </form>
+
+  <h2>Захищені дії</h2>
+  <button id="protected-btn">Отримати секретні дані</button>
+  <button id="logout-btn">Вийти</button>
+  <button id="get-users-btn">Отримати список користувачів</button>
+  <div id="users-list-container" style="margin-top: 16px;"></div>
+
+  <script src="app.js"></script>
+</body>
+
+</html>
