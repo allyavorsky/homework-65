@@ -22,6 +22,7 @@ async function connectDB() {
   }
 }
 
+// READ: (all)
 app.get("/products", async (req, res) => {
   try {
     const collection = db.collection("products");
@@ -33,6 +34,7 @@ app.get("/products", async (req, res) => {
   }
 });
 
+// CREATE: (single)
 app.post("/products", async (req, res) => {
   try {
     const collection = db.collection("products");
@@ -51,6 +53,7 @@ app.post("/products", async (req, res) => {
   }
 });
 
+// CREATE: (many)
 app.post("/products/many", async (req, res) => {
   try {
     const collection = db.collection("products");
@@ -72,25 +75,22 @@ app.post("/products/many", async (req, res) => {
   }
 });
 
+// UPDATE: (single)
 app.patch("/products/:id", async (req, res) => {
   try {
     const collection = db.collection("products");
     const { id } = req.params;
     const updates = req.body;
-
     if (!updates || Object.keys(updates).length === 0) {
       return res.status(400).json({ message: "Update data is required" });
     }
-
     try {
       const filter = { _id: new ObjectId(id) };
       const updateDoc = { $set: updates };
       const result = await collection.updateOne(filter, updateDoc);
-
       if (result.matchedCount === 0) {
         return res.status(404).json({ message: "Product not found" });
       }
-
       res
         .status(200)
         .json({
@@ -106,26 +106,23 @@ app.patch("/products/:id", async (req, res) => {
   }
 });
 
+// UPDATE: (many)
 app.patch("/products/many", async (req, res) => {
   try {
     const collection = db.collection("products");
     const { filter, updates } = req.body;
-
     if (!filter || !updates || Object.keys(updates).length === 0) {
       return res
         .status(400)
         .json({ message: "Filter and update data are required" });
     }
-
     const updateDoc = { $set: updates };
     const result = await collection.updateMany(filter, updateDoc);
-
     if (result.matchedCount === 0) {
       return res
         .status(404)
         .json({ message: "No products found matching the criteria" });
     }
-
     res.status(200).json({
       message: "Products updated successfully",
       matchedCount: result.matchedCount,
@@ -137,12 +134,12 @@ app.patch("/products/many", async (req, res) => {
   }
 });
 
+// UPDATE: (single)
 app.put("/products/:id", async (req, res) => {
   try {
     const collection = db.collection("products");
     const { id } = req.params;
     const replacementProduct = req.body;
-
     if (
       !replacementProduct ||
       !replacementProduct.name ||
@@ -152,15 +149,12 @@ app.put("/products/:id", async (req, res) => {
         .status(400)
         .json({ message: "Replacement data must include name and price" });
     }
-
     try {
       const filter = { _id: new ObjectId(id) };
       const result = await collection.replaceOne(filter, replacementProduct);
-
       if (result.matchedCount === 0) {
         return res.status(404).json({ message: "Product not found" });
       }
-
       res
         .status(200)
         .json({
@@ -176,25 +170,47 @@ app.put("/products/:id", async (req, res) => {
   }
 });
 
+// DELETE: (single)
 app.delete("/products/:id", async (req, res) => {
   try {
     const collection = db.collection("products");
     const { id } = req.params;
-
     try {
       const filter = { _id: new ObjectId(id) };
       const result = await collection.deleteOne(filter);
-
       if (result.deletedCount === 0) {
         return res.status(404).json({ message: "Product not found" });
       }
-
       res.status(200).json({ message: "Product deleted successfully" });
     } catch (error) {
       return res.status(400).json({ message: "Invalid product ID format" });
     }
   } catch (error) {
     console.error("Error deleting product:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+// DELETE: (many)
+app.delete("/products", async (req, res) => {
+  try {
+    const collection = db.collection("products");
+    const filter = req.body;
+    if (!filter || Object.keys(filter).length === 0) {
+      return res.status(400).json({ message: "Delete filter is required" });
+    }
+    const result = await collection.deleteMany(filter);
+    if (result.deletedCount === 0) {
+      return res
+        .status(404)
+        .json({ message: "No products found matching the criteria to delete" });
+    }
+    res.status(200).json({
+      message: "Products deleted successfully",
+      deletedCount: result.deletedCount,
+    });
+  } catch (error) {
+    console.error("Error deleting multiple products:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
