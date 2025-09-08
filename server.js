@@ -33,6 +33,7 @@ app.get("/products", async (req, res) => {
   }
 });
 
+// CREATE: single
 app.post("/products", async (req, res) => {
   try {
     const collection = db.collection("products");
@@ -43,12 +44,38 @@ app.post("/products", async (req, res) => {
     }
 
     const result = await collection.insertOne(newProduct);
+
     res.status(201).json({
       message: "Product created successfully",
       insertedId: result.insertedId,
     });
   } catch (error) {
     console.error("Error creating product:", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+// CREATE: many
+app.post("/products/many", async (req, res) => {
+  try {
+    const collection = db.collection("products");
+    const newProducts = req.body;
+
+    if (!Array.isArray(newProducts) || newProducts.length === 0) {
+      return res
+        .status(400)
+        .json({ message: "Products data must be a non-empty array" });
+    }
+
+    const result = await collection.insertMany(newProducts);
+
+    res.status(201).json({
+      message: "Products created successfully",
+      insertedCount: result.insertedCount,
+      insertedIds: result.insertedIds,
+    });
+  } catch (error) {
+    console.error("Error creating multiple products:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 });
